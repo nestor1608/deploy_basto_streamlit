@@ -31,11 +31,11 @@ data_week=count_register_week(fi_time)
 fig= px.bar( data_week,x='createdAt',y='count_register')
 st.plotly_chart(fig,use_container_width=True) 
 
-week= st.slider('Selecione semana',data_week['createdAt'].min() ,data_week['createdAt'].max(),1)
+week= st.slider('Selecione semana',data_week['createdAt'].min() ,data_week['createdAt'].max(),0)
 
 val_vaca= interview_vaca(fi_time)
 
-time_week= week_data_filter(fi_time,'2023-02-14')
+time_week= week_data_filter(fi_time,week)
 
 if st.button('Recorrido en Mapa'):
     fig = go.Figure()
