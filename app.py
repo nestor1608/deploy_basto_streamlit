@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 from funciones_app import setle_lat,setle_lng,area_perimetro,filter_time_day,interview_vaca,data_devices,week_data_filter
 from conect_datarows import setle_clean,selec_setle,obtener_fecha_inicio_fin
-
+import datetime
 
 setle= setle_clean()# arroja dataframe arreglado de setle---
 
@@ -21,6 +21,7 @@ uuid_devis = on_perimetro.UUID.values
 
 select=st.selectbox("seleccionar collar",uuid_devis)
 dt_vaca=  data_devices(on_perimetro,select)
+dt_vaca.createdAt= pd.to_datetime(dt_vaca.createdAt)
 data_week= dt_vaca.groupby(['UUID',dt_vaca.createdAt.dt.week]).agg({'createdAt':'count'}).rename(columns={'createdAt':'count_register'})
 data_week=data_week.reset_index()
 print(data_week.columns)
