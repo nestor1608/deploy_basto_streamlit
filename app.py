@@ -31,9 +31,9 @@ week= st.slider('Selecione semana',int(data_week['createdAt'].min()) ,int(data_w
 
 moment_day=['madrugada','mañana','tarde','noche']
 time_day=st.slider('Selecione momento del dia',0,len(moment_day)-1,0)
-fi_time= filter_time_day(dt_vaca,moment_day[time_day])
+time_week= week_data_filter(dt_vaca,week)
+fi_time= filter_time_day(time_week,moment_day[time_day])
 
-time_week= week_data_filter(fi_time,week)
 try:
     date_week= obtener_fecha_inicio_fin(time_week.iloc[-1][['createdAt']].values[0])
     st.subheader(f'Fecha de Inicio: {date_week[0]}')
