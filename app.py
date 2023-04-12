@@ -28,10 +28,11 @@ st.write(moment_day[time_day])
 
 fi_time= filter_time_day(dt_vaca,moment_day[time_day])
 data_week=count_register_week(fi_time)
+
 fig= px.bar( data_week,x='createdAt',y='count_register')
 st.plotly_chart(fig,use_container_width=True) 
 
-week= st.slider('Selecione semana',data_week['createdAt'].min() ,data_week['createdAt'].max(),0)
+week= st.slider('Selecione semana',7 ,13)
 
 val_vaca= interview_vaca(fi_time)
 
