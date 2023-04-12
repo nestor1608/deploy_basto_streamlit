@@ -3,8 +3,8 @@ import pandas as pd
 from suport_st import grafic_map,mapbox_access_token
 import plotly.graph_objects as go
 import plotly.express as px
-from funciones_app import setle_lat,setle_lng,area_perimetro,filter_time_day,interview_vaca,gps_data,data_devices,week_data_filter
-from conect_datarows import setle_clean,selec_setle,count_register_week
+from funciones_app import setle_lat,setle_lng,area_perimetro,filter_time_day,interview_vaca,data_devices,week_data_filter
+from conect_datarows import setle_clean,selec_setle,count_register_week,obtener_fecha_inicio_fin
 
 
 setle= setle_clean()# arroja dataframe arreglado de setle---
@@ -22,21 +22,30 @@ uuid_devis = on_perimetro.UUID.values
 select=st.selectbox("seleccionar collar",uuid_devis)
 dt_vaca=  data_devices(on_perimetro,select)
 
-moment_day=['madrugada','mañana','tarde','noche']
-time_day=st.slider('Selecione momento del dia',0,len(moment_day)-1,0)
-st.write(moment_day[time_day])
-
-fi_time= filter_time_day(dt_vaca,moment_day[time_day])
-data_week=count_register_week(fi_time)
-
+data_week= count_register_week(dt_vaca)
 fig= px.bar( data_week,x='createdAt',y='count_register')
 st.plotly_chart(fig,use_container_width=True) 
+week= st.slider('Selecione semana',int(data_week['createdAt'].min()) ,int(data_week['createdAt'].max()) )
 
-week= st.slider('Selecione semana',7 ,13)
+
+moment_day=['madrugada','mañana','tarde','noche']
+time_day=st.slider('Selecione momento del dia',0,len(moment_day)-1,0)
+fi_time= filter_time_day(dt_vaca,moment_day[time_day])
+
+time_week= week_data_filter(fi_time,week)
+try:
+    date_week= obtener_fecha_inicio_fin(time_week.iloc[-1][['createdAt']].values[0])
+    st.subheader(f'Fecha de Inicio: {date_week[0]}')
+    st.subheader(f'Fecha de fin: {date_week[1]}')
+except IndexError:
+    st.warning('No hay datos para estos momento del dia')
+
+st.subheader(moment_day[time_day].upper())
+
+
 
 val_vaca= interview_vaca(fi_time)
 
-time_week= week_data_filter(fi_time,week)
 
 if st.button('Recorrido en Mapa'):
     fig = go.Figure()
