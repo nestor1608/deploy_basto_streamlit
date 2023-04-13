@@ -6,14 +6,17 @@ import seaborn as sns
 import matplotlib.colors as mcolors
 import random
 
-
+def lista_colores_ux_ui():
+    colores = ["#007bff", "#28a745", "#dc3545", "#ffc107", "#17a2b8", "#6c757d", "#343a40", "#f8f9fa", "#343a40", "#007bff", "#28a745", "#dc3545", "#ffc107", "#17a2b8", "#6c757d", "#343a40", "#f8f9fa", "#343a40", "#007bff", "#28a745", "#dc3545", "#ffc107", "#17a2b8", "#6c757d", "#343a40", "#f8f9fa", "#343a40", "#007bff", "#28a745", "#dc3545", "#ffc107", "#17a2b8", "#6c757d", "#343a40", "#f8f9fa", "#343a40"]
+    return colores
 
 def random_color():
     """Genera un color cálido aleatorio en formato hexadecimal."""
-    n = random.randint(2,100)
-    paleta= sns.color_palette("deep",n_colors=n)
-    colores_hex = [mcolors.rgb2hex(color) for color in paleta]
-    return colores_hex[random.randint(1,n-1)]
+    lista_colores= lista_colores_ux_ui()
+    n = random.randint(2,len(lista_colores))
+    # paleta= sns.color_palette("deep",n_colors=n)
+    # colores_hex = [mcolors.rgb2hex(color) for color in paleta]
+    return lista_colores[n]
 
 df_gps=df_gps
 

@@ -6,8 +6,17 @@ from conect_datarows import df_gps
 import math
 import pandas as pd
 import datetime
-"""funcion que puede arrojar la distancia[0], velocidad promedio[1], timepo que llevo el recorrido [2] recorrida entre el primer punto de la lista y el ultimo los datos tiene que ser solo gps.. hya otra funcion que la complemeta para limpiar estos datos """
+
+
 def distancia_recorrida(data):
+    """funcion que puede arrojar la distancia[0], velocidad promedio[1], timepo que llevo el recorrido [2] recorrida entre el primer punto de la lista y el ultimo los datos tiene que ser solo gps.. hya otra funcion que la complemeta para limpiar estos datos
+
+    Args:
+        data (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     cordena1=tuple(data.iloc[0][['dataRowData_lat','dataRowData_lng']].values)
     cordena2= tuple(data.iloc[-1][['dataRowData_lat','dataRowData_lng']].values)
     dista_km= great_circle(cordena1,cordena2).kilometers
