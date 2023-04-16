@@ -16,6 +16,13 @@ def selec_setle(data,select):
     df_setle = data[data._id== select]
     return df_setle
 
+def animl_clean():
+    animal_n= pd.read_csv('data_animals.csv')
+    return animal_n
+
+def selec_anim(data,select):
+    df_anim= data[data._id==select]
+    return df_anim
 # def count_register_week(data):
 #     week_x= data.groupby(['UUID',data.createdAt.dt.week]).agg({'createdAt':'count'}).rename(columns={'createdAt':'count_register'})
 #     week_x=week_x.reset_index()
