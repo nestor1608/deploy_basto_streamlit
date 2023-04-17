@@ -1,6 +1,5 @@
 import streamlit as st
-<<<<<<< HEAD
-=======
+
 import pandas as pd
 from suport_st import grafic_map,mapbox_access_token
 import plotly.graph_objects as go
@@ -8,20 +7,19 @@ import plotly.express as px
 from funciones_app import filter_area_perimetro,filter_time_day,data_devices,week_data_filter,aguada,dataframe_interview_vaca
 from conect_datarows import setle_clean,selec_setle,obtener_fecha_inicio_fin,df_gps
 
->>>>>>> main
 
 st.set_page_config(page_title='Página de inicio ', 
-                   page_icon='🐮', 
-                   layout="centered", 
-                   initial_sidebar_state="auto", 
-                   menu_items=None)
+                    page_icon='🐮', 
+                    layout="centered", 
+                    initial_sidebar_state="auto", 
+                    menu_items=None)
 
 col1, col2, col3 = st.columns(3)
 
 with col1:
     st.write(' ')
 
-<<<<<<< HEAD
+
 with col2:
     st.image("imagenes/BASTO.jpeg")
 
@@ -31,7 +29,8 @@ with col3:
 st.title('Bienvenido a BASTÓ')
 
 st.write('BASTÓ es un StartUp que apuesta por la transformación de la ganadería. A través del desarrollo de una cerca virtual dinámica que, a través de un collar inteligente, emite estímulos inocuos, cuidando el bienestar animal, contiene y arrea al ganado de un corral a otro gestionando un pastoreo eficiente, sustentable y de precisión.')
-=======
+
+setle= setle_clean()
 select_sl= st.selectbox('Seleccione un asentamiento',setle.name.unique())
 nombre = setle[setle.name== select_sl]._id.values[0]
 elec_setle= selec_setle(setle,nombre) # arroja dataframe pequeño de un solo dato del asentamiento---
@@ -48,19 +47,19 @@ if on_perimetro.shape[0]!=0:
 
     data_week= dt_vaca.groupby(['UUID',dt_vaca.createdAt.dt.week]).agg({'createdAt':'count'}).rename(columns={'createdAt':'count_register'})
     data_week=data_week.reset_index()
->>>>>>> main
+
 
 st.write('A través de esta página podemos visualizar los datos de GPS del ganado a lo largo de una serie de tiempo para observar el comportamiento en 4 momentos específicos del día: Madrugada, Mañana, Tarde y Noche de la siguiente forma:')
 
-<<<<<<< HEAD
+
 st.image('imagenes/GPS_potr.png')
 
 st.write('Para consultar datos sobre el ganado de sus potreros, seleccione la pestaña Home, en donde se visualizará un despliegue de información general y particular sobre áreas deseadas.')
-=======
-    if int(data_week['createdAt'].min())!= int(data_week['createdAt'].max()):
-        fig= px.bar( data_week,x='createdAt',y='count_register')
-        st.plotly_chart(fig,use_container_width=True)
-        week= st.slider('Selecione semana',int(data_week['createdAt'].min()) ,int(data_week['createdAt'].max()) )
+
+if int(data_week['createdAt'].min())!= int(data_week['createdAt'].max()):
+    fig= px.bar( data_week,x='createdAt',y='count_register')
+    st.plotly_chart(fig,use_container_width=True)
+    week= st.slider('Selecione semana',int(data_week['createdAt'].min()) ,int(data_week['createdAt'].max()) )
 
 
 
@@ -132,4 +131,4 @@ st.write('Para consultar datos sobre el ganado de sus potreros, seleccione la pe
     st.dataframe(val_vaca)
 else:
     st.warning('Lugar sin dato')
->>>>>>> main
+

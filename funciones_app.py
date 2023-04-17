@@ -58,10 +58,7 @@ def perimetro_aprox(hectarea):
 
 def filter_area_perimetro(data,latitud,longitud,hectareas):
     """Funcion que genera a partir de otro dataframe, un dataframe nuevo a partir de un un punto latitud longitud y la cantidad de hectareas fitra ese perimetro
-<<<<<<< HEAD
-=======
 
->>>>>>> main
     Args:
         data(dataframe): dataframe a filtrar
         latitud (gps): latitud de punto central
@@ -157,11 +154,9 @@ def aguada(data: pd.DataFrame)->pd.DataFrame:
         :param area: Tamaño del potrero en hectareas.
         :return: Coordenadas (latitud y longitud) de la aguada.
     """
-<<<<<<< HEAD
+
     puntos_fijos = pd.read_csv('csv/devices_punto_fijo.csv')
-=======
-    puntos_fijos = pd.read_csv('devices_punto_fijo.csv')
->>>>>>> main
+
     df_pf = puntos_fijos.drop(puntos_fijos[puntos_fijos['deviceMACAddress'].isin(['PRUEBA', 'MEVBE4FED3B7594'])].index)
     df_merged = pd.merge(df_pf, data, left_on='deviceMACAddress', right_on='UUID')
     df_merged['coordenadas'] = df_merged[['dataRowData_lat', 'dataRowData_lng']].apply(lambda x: ','.join(x.astype(str)), axis=1)

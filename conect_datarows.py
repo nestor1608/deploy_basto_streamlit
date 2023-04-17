@@ -23,10 +23,6 @@ def animl_clean():
 def selec_anim(data,select):
     df_anim= data[data._id==select]
     return df_anim
-# def count_register_week(data):
-#     week_x= data.groupby(['UUID',data.createdAt.dt.week]).agg({'createdAt':'count'}).rename(columns={'createdAt':'count_register'})
-#     week_x=week_x.reset_index()
-#     return week_x
 
 
 def obtener_fecha_inicio_fin(semana):
