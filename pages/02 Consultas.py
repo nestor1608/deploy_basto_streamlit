@@ -3,8 +3,8 @@ import pandas as pd
 from suport_st import grafic_map,mapbox_access_token
 import plotly.graph_objects as go
 import plotly.express as px
-from funciones_app import setle_lat,setle_lng,area_perimetro,filter_time_day,interview_vaca,data_devices,week_data_filter
-from conect_datarows import setle_clean,selec_setle,obtener_fecha_inicio_fin
+from funciones_app import filter_time_day,dataframe_interview_vaca,data_devices,week_data_filter, filter_area_perimetro
+from conect_datarows import setle_clean,selec_setle,obtener_fecha_inicio_fin, df_gps
 import datetime
 
 
@@ -26,33 +26,50 @@ nombre= setle[setle.name==select_sl]._id.values[0]
 print(nombre)
 elec_setle= selec_setle(setle,nombre) # arroja dataframe pequeño de un solo dato del asentamiento---
 
-on_perimetro=area_perimetro(elec_setle.latitud_c, elec_setle.longitud_c, elec_setle.hectares)# arroja dataframe---
-uuid_devis = on_perimetro.UUID.unique()
+on_perimetro=filter_area_perimetro(df_gps,elec_setle.latitud_c, elec_setle.longitud_c, elec_setle.hectares)# arroja dataframe---
+if on_perimetro.shape[0]!=0:
+    # agua = aguada(on_perimetro)
+    # on_perimetro = on_perimetro.drop(on_perimetro[on_perimetro['UUID'] == agua.loc[0,'UUID']].index)
+    uuid_devis = on_perimetro.UUID.unique()
 
-select=st.selectbox("Ahora seleccione un collar",uuid_devis)
-dt_vaca=  data_devices(on_perimetro,select)
+    select=st.selectbox("Ahora seleccione un collar",uuid_devis)
+    dt_vaca=  data_devices(on_perimetro,select)
+    dt_vaca.createdAt= pd.to_datetime(dt_vaca.createdAt)
+
+    data_week= dt_vaca.groupby(['UUID',dt_vaca.createdAt.dt.week]).agg({'createdAt':'count'}).rename(columns={'createdAt':'count_register'})
+    data_week=data_week.reset_index()
 
 
 st.write('Visualización de los registros obtenidos a lo largo del tiempo de ese collar en esa locaclización en específica:')
 
 
-dt_vaca.createdAt= pd.to_datetime(dt_vaca.createdAt)
-data_week= dt_vaca.groupby(['UUID',dt_vaca.createdAt.dt.week]).agg({'createdAt':'count'}).rename(columns={'createdAt':'count_register'})
-data_week=data_week.reset_index()
+#dt_vaca.createdAt= pd.to_datetime(dt_vaca.createdAt)
+#data_week= dt_vaca.groupby(['UUID',dt_vaca.createdAt.dt.week]).agg({'createdAt':'count'}).rename(columns={'createdAt':'count_register'})
+#data_week=data_week.reset_index()
 
 
 st.write('Ahora puede observar una semana en específica con el menú siguiente:')
 
-fig= px.bar( data_week,x='createdAt',y='count_register')
-st.plotly_chart(fig,use_container_width=True) 
-week= st.slider('Selecione semana',int(data_week['createdAt'].min()) ,int(data_week['createdAt'].max()) )
+if int(data_week['createdAt'].min())!= int(data_week['createdAt'].max()):
+        fig= px.bar( data_week,x='createdAt',y='count_register')
+        st.plotly_chart(fig,use_container_width=True)
+        week= st.slider('Selecione semana',int(data_week['createdAt'].min()) ,int(data_week['createdAt'].max()) )
 
 st.write('En esa semana específica, puede visualizar los datos de un momento específico del día y sus datos de ese collar en específico: Madrugada(0), Mañana(1), Tarde(2), Noche(3)')
 
 moment_day=['madrugada','mañana','tarde','noche']
-time_day=st.slider('Selecione momento del dia',0,len(moment_day)-1,0)
+time_day=st.select_slider('Selecione momento del dia',options=moment_day)
+
 time_week= week_data_filter(dt_vaca,week)
-fi_time= filter_time_day(time_week,moment_day[time_day])
+fi_time= filter_time_day(time_week,time_day)
+sep_time=time_week.groupby(time_week.createdAt.dt.date).agg({'UUID':'count'}).rename(columns={'UUID':'count_register'}).reset_index().rename(columns={'createdAt':'day'})
+sep_time.day= pd.to_datetime(sep_time.day)
+
+day=sep_time.day.dt.date.values
+
+day_select=st.select_slider('Seleccionar dia',options=day)
+fig=px.bar(sep_time,x=sep_time.day.dt.day_name(), y=sep_time.count_register)
+st.plotly_chart(fig,use_container_width=True) 
 
 try:
     date_week= obtener_fecha_inicio_fin(time_week.iloc[-1][['createdAt']].values[0])
@@ -61,42 +78,47 @@ try:
 except IndexError:
     st.warning('No hay datos para estos momento del dia')
 
-st.subheader(moment_day[time_day].upper())
+st.subheader(time_day.upper())
 
 
+val_vaca= dataframe_interview_vaca(fi_time)
 
-val_vaca= interview_vaca(fi_time)
-
-print(fi_time.shape)
 if st.button('Recorrido en Mapa') or fi_time.shape[0]==1:
-    fig = go.Figure()
-    grafic_map(fi_time,[select],fi_time.iloc[0]['dataRowData_lat'],fi_time.iloc[0]['dataRowData_lng'],fig)
-    fig.update_layout(
-        mapbox=dict(
-            style='satellite', # Estilo de mapa satelital
-            accesstoken=mapbox_access_token,
-            zoom=12, # Nivel de zoom inicial del mapa
-            center=dict(lat=elec_setle.latitud_c.values[0] , lon=elec_setle.longitud_c.values[0]),
-        ),
-        showlegend=False
-    )
-    st.plotly_chart(fig)
+        fig = go.Figure()
+        grafic_map(fi_time,[select], fi_time.iloc[0]['dataRowData_lat'], fi_time.iloc[0]['dataRowData_lng'], fig, aguada(on_perimetro))
+        fig.update_layout(
+            mapbox=dict(
+                style='satellite', # Estilo de mapa satelital
+                accesstoken=mapbox_access_token,
+                zoom=12, # Nivel de zoom inicial del mapa
+                center=dict(lat=elec_setle.latitud_c.values[0] , lon=elec_setle.longitud_c.values[0]),
+            ),
+            showlegend=False
+        )
+        st.plotly_chart(fig)
 
 if fi_time.shape[0]!=0:
     try:
         if fi_time.shape[0]>1:
-            fig=px.line(val_vaca[0])
-            st.plotly_chart(fig,use_container_width=True) 
-        st.write(f'**Movimiento promedio** durante{moment_day[time_day]} de  {pd.Series(val_vaca[0]).mean().round(3)}km')
-        st.write(f'**Distancia recorrida:** {pd.Series(val_vaca[0]).sum().round(3)} km')
-        st.write(f'**Tiempo:** {pd.Series(val_vaca[2]).sum().round(3)} ')
-        fig=px.line(val_vaca[1])
+            fig=px.line(val_vaca['distancia'])
+            st.plotly_chart(fig,use_container_width=True)
+        mean_dist, dist_sum =val_vaca[['distancia']].mean().round(3),val_vaca['distancia'].sum().round(3)
+        sum_tim, time_mean= val_vaca['tiempo'].sum().round(3),val_vaca['tiempo'].mean().round(3)
+        velo_mean=val_vaca['tiempo'].mean().round(3)
+        st.write(f'Movimiento promedio durante {time_day} de  {mean_dist}km')
+        st.write(f'Distancia recorrida: {dist_sum} km')
+        st.write(f'Tiempo: {sum_tim} ')
+        fig=px.area(val_vaca,x=val_vaca.point_ini,y=val_vaca['velocidad'])
         st.plotly_chart(fig,use_container_width=True) 
-        st.write(f'**Velocidad promedio** {pd.Series(val_vaca[1]).mean().round(3)} k/h')
-        fig=px.line(val_vaca[2])
+        st.write(f'Velocidad promedio {velo_mean} k/h')
+        fig=px.line(val_vaca['tiempo'])
         st.plotly_chart(fig,use_container_width=True) 
-        st.write(f'**Tiempo promedio:**  {pd.Series(val_vaca[2]).mean().round(3)} hrs')
+        st.write(f'Tiempo promedio:  {time_mean} hrs')
     except AttributeError:
         st.table(fi_time[['dataRowData_lng','dataRowData_lat' ]])
+    else:
+        st.warning('No hay registro con estos parametros')
+
+    st.dataframe(val_vaca)
 else:
-    st.warning('No hay registro con estos parametros')
+    st.warning('Lugar sin dato')

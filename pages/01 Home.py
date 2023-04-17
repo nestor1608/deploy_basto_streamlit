@@ -3,13 +3,13 @@ import pandas as pd
 from suport_st import grafic_map,mapbox_access_token
 import plotly.graph_objects as go
 import plotly.express as px
-from funciones_app import setle_lat,setle_lng,area_perimetro,filter_time_day,interview_vaca,data_devices,week_data_filter
-from conect_datarows import setle_clean,selec_setle,obtener_fecha_inicio_fin, animl_clean
+from funciones_app import filter_time_day,interview_vaca,data_devices,week_data_filter, filter_area_perimetro
+from conect_datarows import setle_clean,selec_setle,obtener_fecha_inicio_fin, animl_clean, df_gps
 import datetime
 import streamlit_analytics
 import plotly.express as px
 
-st.image('Header_bastó.jpeg')
+st.image('imagenes/Header_bastó.jpeg')
 
 st.title('Información general')
 
@@ -79,7 +79,7 @@ nombre= setle[setle.name==select_sl]._id.values[0]
 print(nombre)
 elec_setle= selec_setle(setle,nombre) # arroja dataframe pequeño de un solo dato del asentamiento---
 
-on_perimetro=area_perimetro(elec_setle.latitud_c, elec_setle.longitud_c, elec_setle.hectares)# arroja dataframe---
+on_perimetro=filter_area_perimetro(df_gps,elec_setle.latitud_c, elec_setle.longitud_c, elec_setle.hectares)# arroja dataframe---
 uuid_devis = on_perimetro.UUID.unique()
 
 clicked_3 = st.button("Conteo dispositivo")
@@ -87,7 +87,5 @@ if clicked_3:
     st.write(
         f"En esta área hay: {len(uuid_devis)} collares que proveen datos de GPS de un total de 518 vacas en total"
     )
-    st.write(
-        f"Hay {df}"
-    )
+    
 

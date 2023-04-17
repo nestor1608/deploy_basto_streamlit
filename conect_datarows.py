@@ -1,14 +1,14 @@
 import datetime
 import pandas as pd
 
-df_gps= pd.read_csv('data_clean_gps.csv',index_col='Unnamed: 0')
+df_gps= pd.read_csv('csv/data_clean_gps.csv',index_col='Unnamed: 0')
 df_gps.createdAt=pd.to_datetime(df_gps.createdAt) 
 df_gps.updatedAt=pd.to_datetime(df_gps.updatedAt)
 
 
 
 def setle_clean():
-    setle_n= pd.read_csv('settle.csv') 
+    setle_n= pd.read_csv('csv/settle.csv') 
     setle_n = setle_n[['_id','hectares','name','latitud_c','longitud_c']]
     return setle_n
 
@@ -17,7 +17,7 @@ def selec_setle(data,select):
     return df_setle
 
 def animl_clean():
-    animal_n= pd.read_csv('data_animals.csv')
+    animal_n= pd.read_csv('csv/data_animals.csv')
     return animal_n
 
 def selec_anim(data,select):
