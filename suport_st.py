@@ -76,4 +76,9 @@ def grafic_map(data, list_vacas, lat_orig, lng_orig, fig, aguada):
         showlegend=False
     )
     graf_aguada(aguada,fig)
+<<<<<<< HEAD
     return fig
+=======
+    return fig
+
+>>>>>>> main
