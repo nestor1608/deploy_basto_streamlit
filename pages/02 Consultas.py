@@ -3,7 +3,7 @@ import pandas as pd
 from suport_st import grafic_map,mapbox_access_token
 import plotly.graph_objects as go
 import plotly.express as px
-from funciones_app import filter_time_day,dataframe_interview_vaca,data_devices,week_data_filter, filter_area_perimetro
+from funciones_app import filter_time_day,dataframe_interview_vaca,data_devices,week_data_filter, filter_area_perimetro,aguada
 from conect_datarows import setle_clean,selec_setle,obtener_fecha_inicio_fin, df_gps
 import datetime
 
@@ -23,7 +23,7 @@ st.write('Favor de aplicar los filtros necesarios para su consulta:')
 
 select_sl= st.selectbox('Seleccione un asentamiento',setle.name.unique())
 nombre= setle[setle.name==select_sl]._id.values[0]
-print(nombre)
+
 elec_setle= selec_setle(setle,nombre) # arroja dataframe pequeño de un solo dato del asentamiento---
 
 on_perimetro=filter_area_perimetro(df_gps,elec_setle.latitud_c, elec_setle.longitud_c, elec_setle.hectares)# arroja dataframe---
@@ -43,19 +43,16 @@ if on_perimetro.shape[0]!=0:
 st.write('Visualización de los registros obtenidos a lo largo del tiempo de ese collar en esa locaclización en específica:')
 
 
-#dt_vaca.createdAt= pd.to_datetime(dt_vaca.createdAt)
-#data_week= dt_vaca.groupby(['UUID',dt_vaca.createdAt.dt.week]).agg({'createdAt':'count'}).rename(columns={'createdAt':'count_register'})
-#data_week=data_week.reset_index()
-
 
 st.write('Ahora puede observar una semana en específica con el menú siguiente:')
 
 if int(data_week['createdAt'].min())!= int(data_week['createdAt'].max()):
         fig= px.bar( data_week,x='createdAt',y='count_register')
+        st.markdown('## Cantidad de registro por Semana')
         st.plotly_chart(fig,use_container_width=True)
         week= st.slider('Selecione semana',int(data_week['createdAt'].min()) ,int(data_week['createdAt'].max()) )
 
-st.write('En esa semana específica, puede visualizar los datos de un momento específico del día y sus datos de ese collar en específico: Madrugada(0), Mañana(1), Tarde(2), Noche(3)')
+st.write('En esa semana específica, puede visualizar los datos de un momento específico del día y sus datos de ese collar en específico:')
 
 moment_day=['madrugada','mañana','tarde','noche']
 time_day=st.select_slider('Selecione momento del dia',options=moment_day)
@@ -68,6 +65,8 @@ sep_time.day= pd.to_datetime(sep_time.day)
 day=sep_time.day.dt.date.values
 
 day_select=st.select_slider('Seleccionar dia',options=day)
+st.markdown('***')
+st.markdown('## Cantidad de registro por dia')
 fig=px.bar(sep_time,x=sep_time.day.dt.day_name(), y=sep_time.count_register)
 st.plotly_chart(fig,use_container_width=True) 
 
@@ -100,25 +99,32 @@ if st.button('Recorrido en Mapa') or fi_time.shape[0]==1:
 if fi_time.shape[0]!=0:
     try:
         if fi_time.shape[0]>1:
-                fig=px.line(val_vaca['distancia'])
-                st.plotly_chart(fig,use_container_width=True)
                 mean_dist, dist_sum =val_vaca[['distancia']].mean().round(3),val_vaca['distancia'].sum().round(3)
                 sum_tim, time_mean= val_vaca['tiempo'].sum().round(3),val_vaca['tiempo'].mean().round(3)
                 velo_mean=val_vaca['tiempo'].mean().round(3)
-                st.write(f'Movimiento promedio durante {time_day} de  {mean_dist}km')
-                st.write(f'Distancia recorrida: {dist_sum} km')
-                st.write(f'Tiempo: {sum_tim} ')
+                st.markdown(f'Movimiento promedio durante **{time_day}** fue  **{mean_dist.values[0]}**km')
+                st.markdown(f'Distancia recorrida: **{dist_sum}** km')
+                st.markdown(f'Tiempo: {sum_tim} ')
+                st.markdown('***')
+                st.subheader('Variaciones de movimiento y distancia')
+                fig=px.line(val_vaca['distancia'])
+                st.plotly_chart(fig,use_container_width=True)
+                st.markdown('***')
+                st.subheader('Alteracion de velocidad')
                 fig=px.area(val_vaca,x=val_vaca.point_ini,y=val_vaca['velocidad'])
                 st.plotly_chart(fig,use_container_width=True) 
-                st.write(f'Velocidad promedio {velo_mean} k/h')
+                st.markdown(f'* Velocidad promedio **{velo_mean}** k/h')
+                st.markdown('***')
+                
+                st.subheader('Variaciones de Tiempo ')
                 fig=px.line(val_vaca['tiempo'])
                 st.plotly_chart(fig,use_container_width=True) 
-                st.write(f'Tiempo promedio:  {time_mean} hrs')
+                st.markdown(f'* Tiempo promedio:  **{time_mean}** hrs')
         else:
             st.warning('No hay registro con estos parametros')
     except AttributeError:
         st.table(fi_time[['dataRowData_lng','dataRowData_lat' ]])
-
+    st.markdown('***')
     st.dataframe(val_vaca)
 else:
     st.warning('Lugar sin dato')

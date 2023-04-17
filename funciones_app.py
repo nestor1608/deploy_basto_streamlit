@@ -21,31 +21,6 @@ def distancia_recorrida(data):
     return dista_km
 
 
-def interview_vaca(data): # tratar de filtrar por perimetro porque si hay valores (que los hay)fuera de rango de los -90 90 da error
-    data_dis=[]
-    data_vel=[]
-    data_time=[]
-    for i in range(0,data.shape[0]+1):
-        try:
-            dista_km= great_circle(tuple(data.iloc[i][['dataRowData_lat','dataRowData_lng']].values),tuple(data.iloc[i+1][['dataRowData_lat','dataRowData_lng']].values)).kilometers
-            if dista_km <= 8.:
-                data_dis.append(round(dista_km,3))
-            if data.iloc[i].dataRowData_gpsVel:
-                data_vel.append(round(data.iloc[i].dataRowData_gpsVel,3))
-                data_time.append(round(dista_km/data.iloc[i].dataRowData_gpsVel,3))
-            else:
-                data_time.append(round(dista_km/pd.Series(data_vel).mean(),3))# les puede dar error si el array de velocidad esta vacio... toma el valor promedio de las velocidades que hay hasta el momento
-        except IndexError:
-            pass
-    return data_dis,data_vel,data_time
-
-
-
-
-gdf= gpd.GeoDataFrame(df_gps,crs='EPSG:4326',geometry=gpd.points_from_xy(df_gps.dataRowData_lng,df_gps.dataRowData_lat))
-
-
-
 def perimetro_aprox(hectarea):
     """Funcion: funcion que saca el numero(float) del radio de un perimetra en kilometros
     Returns:
@@ -192,7 +167,7 @@ def dataframe_interview_vaca(data): # tratar de filtrar por perimetro porque si 
                 data_var = data.iloc[i]['dataRowData_gpsVel']
                 data_alg.append(data_var)
             else:
-                data_var = data.iloc[i+1]['dataRowData_gpsVel']/data.iloc[i-1]['dataRowData_gpsVel']
+                data_var = data.iloc[i+1]['dataRowData_gpsVel']- data.iloc[i-1]['dataRowData_gpsVel']
                 data_alg.append(data_var)
             if dista_km <= 8.:
                 data_dis.append(round(dista_km,3))
