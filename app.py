@@ -49,12 +49,12 @@ st.write('BASTÓ es un StartUp que apuesta por la transformación de la ganader�
 #     data_week=data_week.reset_index()
 
 
-# st.write('A través de esta página podemos visualizar los datos de GPS del ganado a lo largo de una serie de tiempo para observar el comportamiento en 4 momentos específicos del día: Madrugada, Mañana, Tarde y Noche de la siguiente forma:')
+st.write('A través de esta página podemos visualizar los datos de GPS del ganado a lo largo de una serie de tiempo para observar el comportamiento en 4 momentos específicos del día: Madrugada, Mañana, Tarde y Noche de la siguiente forma:')
 
 
-# st.image('imagenes/GPS_potr.png')
+st.image('imagenes/GPS_potr.png')
 
-# st.write('Para consultar datos sobre el ganado de sus potreros, seleccione la pestaña Home, en donde se visualizará un despliegue de información general y particular sobre áreas deseadas.')
+st.write('Para consultar datos sobre el ganado de sus potreros, seleccione la pestaña Home, en donde se visualizará un despliegue de información general y particular sobre áreas deseadas.')
 
 # if int(data_week['createdAt'].min())!= int(data_week['createdAt'].max()):
 #     fig= px.bar( data_week,x='createdAt',y='count_register')
