@@ -5,8 +5,6 @@ import plotly.graph_objects as go
 import plotly.express as px
 from funciones_app import filter_time_day,interview_vaca,data_devices,week_data_filter, filter_area_perimetro
 from conect_datarows import setle_clean,selec_setle,obtener_fecha_inicio_fin, animl_clean, df_gps
-import datetime
-import streamlit_analytics
 import plotly.express as px
 
 st.image('imagenes/Header_bastó.jpeg')

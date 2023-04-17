@@ -100,24 +100,24 @@ if st.button('Recorrido en Mapa') or fi_time.shape[0]==1:
 if fi_time.shape[0]!=0:
     try:
         if fi_time.shape[0]>1:
-            fig=px.line(val_vaca['distancia'])
-            st.plotly_chart(fig,use_container_width=True)
-        mean_dist, dist_sum =val_vaca[['distancia']].mean().round(3),val_vaca['distancia'].sum().round(3)
-        sum_tim, time_mean= val_vaca['tiempo'].sum().round(3),val_vaca['tiempo'].mean().round(3)
-        velo_mean=val_vaca['tiempo'].mean().round(3)
-        st.write(f'Movimiento promedio durante {time_day} de  {mean_dist}km')
-        st.write(f'Distancia recorrida: {dist_sum} km')
-        st.write(f'Tiempo: {sum_tim} ')
-        fig=px.area(val_vaca,x=val_vaca.point_ini,y=val_vaca['velocidad'])
-        st.plotly_chart(fig,use_container_width=True) 
-        st.write(f'Velocidad promedio {velo_mean} k/h')
-        fig=px.line(val_vaca['tiempo'])
-        st.plotly_chart(fig,use_container_width=True) 
-        st.write(f'Tiempo promedio:  {time_mean} hrs')
+                fig=px.line(val_vaca['distancia'])
+                st.plotly_chart(fig,use_container_width=True)
+                mean_dist, dist_sum =val_vaca[['distancia']].mean().round(3),val_vaca['distancia'].sum().round(3)
+                sum_tim, time_mean= val_vaca['tiempo'].sum().round(3),val_vaca['tiempo'].mean().round(3)
+                velo_mean=val_vaca['tiempo'].mean().round(3)
+                st.write(f'Movimiento promedio durante {time_day} de  {mean_dist}km')
+                st.write(f'Distancia recorrida: {dist_sum} km')
+                st.write(f'Tiempo: {sum_tim} ')
+                fig=px.area(val_vaca,x=val_vaca.point_ini,y=val_vaca['velocidad'])
+                st.plotly_chart(fig,use_container_width=True) 
+                st.write(f'Velocidad promedio {velo_mean} k/h')
+                fig=px.line(val_vaca['tiempo'])
+                st.plotly_chart(fig,use_container_width=True) 
+                st.write(f'Tiempo promedio:  {time_mean} hrs')
+        else:
+            st.warning('No hay registro con estos parametros')
     except AttributeError:
         st.table(fi_time[['dataRowData_lng','dataRowData_lat' ]])
-    else:
-        st.warning('No hay registro con estos parametros')
 
     st.dataframe(val_vaca)
 else:
