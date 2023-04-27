@@ -57,21 +57,21 @@ if on_perimetro.shape[0]!=0:
     dt_vaca=  data_devices(on_perimetro,select)
     #dt_vaca.createdAt= pd.to_datetime(dt_vaca.createdAt)
 
-    data_week= dt_vaca.groupby(['UUID',dt_vaca.createdAt.dt.week]).agg({'createdAt':'count'}).rename(columns={'createdAt':'count_register'})
-    data_week=data_week.reset_index()
+#     data_week= dt_vaca.groupby(['UUID',dt_vaca.createdAt.dt.week]).agg({'createdAt':'count'}).rename(columns={'createdAt':'count_register'})
+#     data_week=data_week.reset_index()
 
 
-st.write('Visualización de los registros obtenidos a lo largo del tiempo de ese collar en esa locaclización en específica:')
+# st.write('Visualización de los registros obtenidos a lo largo del tiempo de ese collar en esa locaclización en específica:')
 
 
 
-st.write('Ahora puede observar una semana en específica con el menú siguiente:')
+# st.write('Ahora puede observar una semana en específica con el menú siguiente:')
 
-if int(data_week['createdAt'].min())!= int(data_week['createdAt'].max()):
-        fig= px.bar( data_week,x='createdAt',y='count_register')
-        st.markdown('## Cantidad de registro por Semana')
-        st.plotly_chart(fig,use_container_width=True)
-        week= st.slider('Selecione semana',int(data_week['createdAt'].min()) ,int(data_week['createdAt'].max()) )
+# if int(data_week['createdAt'].min())!= int(data_week['createdAt'].max()):
+#         fig= px.bar( data_week,x='createdAt',y='count_register')
+#         st.markdown('## Cantidad de registro por Semana')
+#         st.plotly_chart(fig,use_container_width=True)
+#         week= st.slider('Selecione semana',int(data_week['createdAt'].min()) ,int(data_week['createdAt'].max()) )
 
 st.write('En esa semana específica, puede visualizar los datos de un momento específico del día y sus datos de ese collar en específico:')
 
