@@ -39,7 +39,7 @@ setle= setle_list()# arroja dataframe arreglado de setle---
 setle= setle_list()# arroja dataframe arreglado de setle---
 
 
-st.dataframe(setle,use_container_width=True)
+st.dataframe(setle[['name','hectares','latitud_c','longitud_c']],use_container_width=True)
 
 
 st.write('Favor de aplicar los filtros necesarios para su consulta:')
@@ -57,7 +57,7 @@ if on_perimetro.shape[0]!=0:
     dt_vaca=  data_devices(on_perimetro,select)
     dt_vaca.createdAt= pd.to_datetime(dt_vaca.createdAt)
 
-    data_week= dt_vaca.groupby(['UUID',dt_vaca.createdAt.dt.week]).agg({'UUID':'count'}).rename(columns={'UUID':'count_register'})
+    data_week= dt_vaca.groupby(['UUID',dt_vaca.createdAt.isocalendar()[1]]).agg({'UUID':'count'}).rename(columns={'UUID':'count_register'})
     data_week=data_week.reset_index()
 
 
