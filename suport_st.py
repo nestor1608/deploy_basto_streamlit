@@ -1,9 +1,6 @@
 import pandas as pd
-from conect_datarows import df_gps
 import plotly.graph_objects as go
 from funciones_app import data_devices, gps_data
-import seaborn as sns
-import matplotlib.colors as mcolors
 import random
 
 def lista_colores_ux_ui():
@@ -54,7 +51,7 @@ def graf_aguada(data,fig):
     ))
     return fig
 
-def grafic_map(data, list_vacas, lat_orig, lng_orig, fig, aguada):
+def grafic_map(data, list_vacas, lat_orig, lng_orig, fig):
     colores=[]
     for i in list_vacas:
         color = random_color()
@@ -64,8 +61,7 @@ def grafic_map(data, list_vacas, lat_orig, lng_orig, fig, aguada):
         dta=data_devices(data, i )
         dta_gps= gps_data(dta)
         uni_graf(dta,color,fig)
-    graf_aguada(aguada,fig)
-    
+
     fig.update_layout(
         mapbox=dict(
             style='satellite', # Estilo de mapa satelital
@@ -75,8 +71,6 @@ def grafic_map(data, list_vacas, lat_orig, lng_orig, fig, aguada):
         ),
         showlegend=False
     )
-    graf_aguada(aguada,fig)
-
     return fig
 
 
