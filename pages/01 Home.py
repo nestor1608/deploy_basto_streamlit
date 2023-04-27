@@ -3,8 +3,8 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import matplotlib.pyplot as plt
-from funciones_app import filter_time_day,dataframe_interview_vaca,data_devices,week_data_filter, filter_area_perimetro
-from conect_datarows import setle_clean,selec_setle,obtener_fecha_inicio_fin, df_gps,setle_list
+from funciones_app import dataframe_interview_vaca,data_devices,week_data_filter, filter_area_perimetro
+from conect_datarows import obtener_fecha_inicio_fin, df_gps,setle_list
 from prueba import conducta_vaca_periodo
 from suport_st import grafic_map,mapbox_access_token
 import plotly.express as px
@@ -36,7 +36,7 @@ setle= setle_list()# arroja dataframe arreglado de setle---
 # st.write('A continuación se pueden observar los diferentes perímetros a consultar a partir de los datos proveídos:')
 
 
-setle= setle_list()# arroja dataframe arreglado de setle---
+
 
 
 st.dataframe(setle[['name','hectares','latitud_c','longitud_c']],use_container_width=True)
@@ -45,9 +45,8 @@ st.dataframe(setle[['name','hectares','latitud_c','longitud_c']],use_container_w
 st.write('Favor de aplicar los filtros necesarios para su consulta:')
 
 select_sl= st.selectbox('Seleccione un asentamiento',setle.name.unique())
-nombre= setle[setle.name=='La Florida']._id.values[0]
 
-elec_setle= setle[setle.name=='La Florida'] # arroja dataframe pequeño de un solo dato del asentamiento---
+# arroja dataframe pequeño de un solo dato del asentamiento---
 on_perimetro=filter_area_perimetro(df_gps,select_sl)# arroja dataframe---
 
 if on_perimetro.shape[0]!=0:
@@ -57,7 +56,7 @@ if on_perimetro.shape[0]!=0:
     dt_vaca=  data_devices(on_perimetro,select)
     dt_vaca.createdAt= pd.to_datetime(dt_vaca.createdAt)
 
-    data_week= dt_vaca.groupby(dt_vaca.createdAt.isocalendar()[1]).agg({'UUID':'count'}).rename(columns={'UUID':'count_register'})
+    data_week= dt_vaca.groupby(dt_vaca.createdAt.dt.isocalendar().week).agg({'UUID':'count'}).rename(columns={'UUID':'count_register'})
     data_week=data_week.reset_index()
 
 
