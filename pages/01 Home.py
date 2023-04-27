@@ -36,7 +36,7 @@ setle= setle_list()# arroja dataframe arreglado de setle---
 # st.write('A continuación se pueden observar los diferentes perímetros a consultar a partir de los datos proveídos:')
 
 
-# setle= setle_list()# arroja dataframe arreglado de setle---
+setle= setle_list()# arroja dataframe arreglado de setle---
 
 
 st.dataframe(setle,use_container_width=True)
@@ -44,11 +44,11 @@ st.dataframe(setle,use_container_width=True)
 
 st.write('Favor de aplicar los filtros necesarios para su consulta:')
 
-# select_sl= st.selectbox('Seleccione un asentamiento',setle.name.unique())
+select_sl= st.selectbox('Seleccione un asentamiento',setle.name.unique())
 nombre= setle[setle.name=='La Florida']._id.values[0]
 
 elec_setle= setle[setle.name=='La Florida'] # arroja dataframe pequeño de un solo dato del asentamiento---
-on_perimetro=filter_area_perimetro(df_gps,elec_setle.latitud_c, elec_setle.longitud_c, elec_setle.hectares)# arroja dataframe---
+on_perimetro=filter_area_perimetro(df_gps,select_sl)# arroja dataframe---
 
 if on_perimetro.shape[0]!=0:
     uuid_devis = on_perimetro.UUID.unique()

@@ -5,8 +5,7 @@ from shapely.geometry import Point
 import math
 import pandas as pd
 import datetime
-from conect_datarows import mongo_data
-
+from conect_datarows import mongo_data,setle_clean
 
 def distancia_recorrida(data):
     """funcion que puede arrojar la distancia[0], velocidad promedio[1], timepo que llevo el recorrido [2] recorrida entre el primer punto de la lista y el ultimo los datos tiene que ser solo gps.. hya otra funcion que la complemeta para limpiar estos datos
@@ -158,7 +157,7 @@ def select_data_by_dates(df: pd.DataFrame, fecha_init: str, fecha_fin : str) -> 
 
     return nuevo_df
 
-def filter_area_perimetro(data,latitud,longitud,hectareas):
+def filter_area_perimetro(data:pd.DataFrame,setle:str):
     """Funcion que genera a partir de otro dataframe, un dataframe nuevo a partir de un un punto latitud longitud y la cantidad de hectareas fitra ese perimetro
 
     Args:
@@ -169,14 +168,17 @@ def filter_area_perimetro(data,latitud,longitud,hectareas):
     Returns:
         _type_: dataframe filtrado dentro de un perimetro generado
     """
+
+    setle= setle_clean(setle)
     gdf= gpd.GeoDataFrame(data,crs='EPSG:4326',geometry=gpd.points_from_xy(data.dataRowData_lng,data.dataRowData_lat))
-    setle_lat=latitud
-    setle_lng=longitud
+    setle_lat=setle['latitud_c'].values[0]
+    setle_lng=setle['longitud_c'].values[0]
+    hectareas=setle['hectares'].values[0]
     punto_referencia= Point(setle_lng,setle_lat)	
     per_kilo= perimetro_aprox(hectareas)
     circulo= punto_referencia.buffer(per_kilo/111.32) # valor 1 grado aprox en kilometro en el ecuador 
     on_perimetro= gdf[gdf.geometry.within(circulo)]
-    agua = update_aguada(on_perimetro)
+    agua = update_aguada(setle._id.values[0])
     on_perimetro = on_perimetro.drop(on_perimetro[on_perimetro['UUID'].isin(agua.deviceMACAddress.unique())].index)
     return on_perimetro
 
