@@ -54,7 +54,7 @@ if on_perimetro.shape[0]!=0:
 
     select=st.selectbox("Ahora seleccione un collar",uuid_devis)
     dt_vaca=  data_devices(on_perimetro,select)
-    dt_vaca.createdAt= pd.to_datetime(dt_vaca.createdAt).date
+    dt_vaca.createdAt= pd.to_datetime(dt_vaca.createdAt)
 
     data_week= dt_vaca.groupby(dt_vaca[['createdAt']].isocalendar().week).agg({'UUID':'count'}).rename(columns={'UUID':'count_register'})
     data_week=data_week.reset_index()
