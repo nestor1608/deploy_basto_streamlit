@@ -5,7 +5,7 @@ from shapely.geometry import Point
 import math
 import pandas as pd
 import datetime
-from conect_datarows import mongo_data,setle_clean
+from conect_datarows import setle_clean
 
 def distancia_recorrida(data):
     """funcion que puede arrojar la distancia[0], velocidad promedio[1], timepo que llevo el recorrido [2] recorrida entre el primer punto de la lista y el ultimo los datos tiene que ser solo gps.. hya otra funcion que la complemeta para limpiar estos datos
@@ -96,21 +96,22 @@ def count_day_hour(data):
     sep_time.day= sep_time.day.map(daytime)
     return sep_time
 
-def conect_animal():
-        df_animal=mongo_data('animals')
-        df_animal['animalSettlement']=df_animal['animalSettlement'].apply(lambda x:x[0])
-        df_animal.animalSettlement=df_animal.animalSettlement.astype(str)
-        result= df_animal[(df_animal.caravanaNumber.str.contains('AGUADA'))|(df_animal.caravanaNumber.str.contains('PUNTO_FIJO'))]#lo use para extraer un csv con aguadas y puntos fijos
-        return result
-
+def conect_animal_aguada():
+    df_animal = pd.read_csv('puntosfijos_aguadas.csv')
+        # df_animal=mongo_data('animals')
+        # df_animal['animalSettlement']=df_animal['animalSettlement'].apply(lambda x:x[0])
+        # df_animal.animalSettlement=df_animal.animalSettlement.astype(str)
+        # result= df_animal[(df_animal.caravanaNumber.str.contains('AGUADA'))|(df_animal.caravanaNumber.str.contains('PUNTO_FIJO'))]
+    return df_animal
 def update_aguada(setle):
-        df_devis= mongo_data('devices')
-        df_devis.deviceAnimalID=df_devis.deviceAnimalID.astype(str)
-        data_devise = df_devis[df_devis.deviceType=='PUNTO FIJO'] 
-        aguadas= conect_animal()
-        x= aguadas[aguadas['animalSettlement']==setle]
-        agua =data_devise[data_devise.deviceAnimalID.isin(x._id)]
-        return agua
+    data_devise = pd.read_csv('devices_punto_fijo.csv')
+        # df_devis= mongo_data('devices')
+        # df_devis.deviceAnimalID=df_devis.deviceAnimalID.astype(str)
+        # data_devise = df_devis[df_devis.deviceType=='PUNTO FIJO'] 
+    aguadas= conect_animal_aguada()
+    x= aguadas[aguadas['animalSettlement']==setle]
+    agua =data_devise[data_devise.deviceAnimalID.isin(x._id)]
+    return agua
 
 
 def select_data_by_date(df: pd.DataFrame, fecha: str) -> pd.DataFrame:

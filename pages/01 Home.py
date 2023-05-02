@@ -94,7 +94,7 @@ st.dataframe(val_vaca,use_container_width=True)
 
 if st.button('Recorrido en Mapa') or fi_time.shape[0]==1:
         fig = go.Figure()
-        grafic_map(fi_time,[select], fi_time.iloc[0]['dataRowData_lat'], fi_time.iloc[0]['dataRowData_lng'], fig)
+        grafic_map(fi_time,[select], fig)
         
         fig.update_layout(
             mapbox=dict(
@@ -137,7 +137,7 @@ if fi_time.shape[0]!=0:
         st.table(fi_time[['dataRowData_lng','dataRowData_lat' ]])
         
 
-    tabla_datos,tabla_resumen,tabla_diag= conducta_vaca_periodo(time_week, on_perimetro,select, select_sl ,date_week[0],date_week[1])# ACAAA ESTA CREADO EL DATAFRAME CON LOS VALORES
+    tabla_datos,tabla_resumen,tabla_diag= conducta_vaca_periodo(time_week, df_gps,select, select_sl ,date_week[0],date_week[1])# ACAAA ESTA CREADO EL DATAFRAME CON LOS VALORES
     
 
 

@@ -2,60 +2,60 @@ import datetime
 import pandas as pd
 import pymongo
 
-async def connection (url):
-    data_mongo = pymongo.MongoClient(url)#'mongodb+srv://brandon:brandon1@cluster0.tfvievv.mongodb.net/?retryWrites=true&w=majority')
-    db = data_mongo['test']
-    return db
-# Seleccionar una base de datos existente o crear una nueva llamada 'test'.
+# data_mongo = pymongo.MongoClient('localhost:27017')#'mongodb+srv://brandon:brandon1@cluster0.tfvievv.mongodb.net/?retryWrites=true&w=majority')
 
-#data_mongo = connection('mongodb+srv://brandon:brandon1@cluster0.tfvievv.mongodb.net/?retryWrites=true&w=majority')
-db = connection('mongodb+srv://brandon:brandon1@cluster0.tfvievv.mongodb.net/?retryWrites=true&w=majority')
+# # Seleccionar una base de datos existente o crear una nueva llamada 'test'.
+# db = data_mongo['test']
 
-# Seleccionar una colección de la base de datos llamada 'datarows'.
-rows = db['datarows']
-data_row= rows.find({'dataRowType':'GPS'})
-df_row=pd.json_normalize(data_row, sep='_')
-df_row._id = df_row._id.astype(str)
+# # Seleccionar una colección de la base de datos llamada 'datarows'.
+# rows = db['datarows']
+# data_row= rows.find({'dataRowType':'GPS'})
+# df_row=pd.json_normalize(data_row, sep='_')
+# df_row._id = df_row._id.astype(str)
 
-df_gps=df_row[['UUID','dataRowType','createdAt','updatedAt','dataRowData_lat','dataRowData_lng','dataRowData_gpsAlt','dataRowData_gpsVel','dataRowData_gpsFixed']]
+# df_gps=df_row[['UUID','dataRowType','createdAt','updatedAt','dataRowData_lat','dataRowData_lng','dataRowData_gpsAlt','dataRowData_gpsVel','dataRowData_gpsFixed']]
+df_gps= pd.read_csv('datarow_gps.csv')
 
-
-async def mongo_data(collection):
-    mongoColle= db[collection]
-    data= list(mongoColle.find())
-    df= pd.json_normalize(data,sep='_')
-    df._id=df._id.astype(str)
-    return df
+# def mongo_data(collection):
+#     mongoColle= db[collection]
+#     data= list(mongoColle.find())
+#     df= pd.json_normalize(data,sep='_')
+#     df._id=df._id.astype(str)
+#     return df
 
 
-async def setle_list():
-    setle_n= mongo_data('settlements')
-    setle_n['latitud_c'] = setle_n.centralPoint.apply(lambda x: x[0]['lat'] if 'lat' in x[0] else None)
-    setle_n['longitud_c'] = setle_n.centralPoint.apply(lambda x: x[0]['lng'] if 'lng' in x[0] else None)
-    setle_n = setle_n[['_id','hectares','name','latitud_c','longitud_c']]
-    setle_n._id = setle_n._id.astype(str)
-    mascara= setle_n._id.isin(['63ff75624c2d6d003084c117','642b1d27cc00091984864f0a','642c0b596490e600305e1819'])
-    setle_n.drop(setle_n[mascara].index,inplace=True)
+def setle_list():
+    setle_n= pd.read_csv('settle.csv')
+    # setle_n= mongo_data('settlements')
+    # setle_n['latitud_c'] = setle_n.centralPoint.apply(lambda x: x[0]['lat'] if 'lat' in x[0] else None)
+    # setle_n['longitud_c'] = setle_n.centralPoint.apply(lambda x: x[0]['lng'] if 'lng' in x[0] else None)
+    # setle_n = setle_n[['_id','hectares','name','latitud_c','longitud_c']]
+    # setle_n._id = setle_n._id.astype(str)
+    # mascara= setle_n._id.isin(['63ff75624c2d6d003084c117','642b1d27cc00091984864f0a','642c0b596490e600305e1819'])
+    # setle_n.drop(setle_n[mascara].index,inplace=True)
     return setle_n
 
-async def setle_clean(select):
-    de= db['settlements']
-    obj= de.find_one({'name':select})
-    df_setle= pd.json_normalize(obj,sep='')
-    df_setle['latitud_c']=df_setle.centralPoint.apply(lambda x: x[0]['lat'] if 'lat' in x[0] else None)
-    df_setle['longitud_c']=df_setle.centralPoint.apply(lambda x: x[0]['lng'] if 'lng' in x[0] else None)
-    setle_n = df_setle[['_id','hectares','registerNumber','headsCount','name','latitud_c','longitud_c']]
+def setle_clean(select):
+    setle_n= setle_list()
+    setle_n= setle_n[setle_n.name== select]
+    # de= db['settlements']
+    # obj= de.find_one({'name':select})
+    # df_setle= pd.json_normalize(obj,sep='')
+    # df_setle['latitud_c']=df_setle.centralPoint.apply(lambda x: x[0]['lat'] if 'lat' in x[0] else None)
+    # df_setle['longitud_c']=df_setle.centralPoint.apply(lambda x: x[0]['lng'] if 'lng' in x[0] else None)
+    # setle_n = df_setle[['_id','hectares','registerNumber','headsCount','name','latitud_c','longitud_c']]
     return setle_n
 
 def selec_setle(data,select):
     df_setle = data[data._id== select]
     return df_setle
 
-async def conect_animal():
-        df_animal=mongo_data('animals')
-        df_animal['animalSettlement']=df_animal['animalSettlement'].apply(lambda x:x[0])
-        df_animal.animalSettlement=df_animal.animalSettlement.astype(str)
-        return df_animal
+def conect_animal():
+    df_animal= pd.read_csv('animal.csv')
+        # df_animal=mongo_data('animals')
+        # df_animal['animalSettlement']=df_animal['animalSettlement'].apply(lambda x:x[0])
+        # df_animal.animalSettlement=df_animal.animalSettlement.astype(str)
+    return df_animal
 
 def selec_anim(data,select):
     df_anim= data[data._id==select]
