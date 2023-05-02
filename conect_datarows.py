@@ -4,11 +4,12 @@ import pymongo
 
 async def connection (url):
     data_mongo = pymongo.MongoClient(url)#'mongodb+srv://brandon:brandon1@cluster0.tfvievv.mongodb.net/?retryWrites=true&w=majority')
-    return data_mongo
+    db = data_mongo['test']
+    return db
 # Seleccionar una base de datos existente o crear una nueva llamada 'test'.
 
-data_mongo = connection('mongodb+srv://brandon:brandon1@cluster0.tfvievv.mongodb.net/?retryWrites=true&w=majority')
-db = data_mongo['test']
+#data_mongo = connection('mongodb+srv://brandon:brandon1@cluster0.tfvievv.mongodb.net/?retryWrites=true&w=majority')
+db = connection('mongodb+srv://brandon:brandon1@cluster0.tfvievv.mongodb.net/?retryWrites=true&w=majority')
 
 # Seleccionar una colección de la base de datos llamada 'datarows'.
 rows = db['datarows']
