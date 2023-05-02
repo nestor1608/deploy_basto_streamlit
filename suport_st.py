@@ -62,15 +62,15 @@ def grafic_map(data, list_vacas, lat_orig, lng_orig, fig):
         dta_gps= gps_data(dta)
         uni_graf(dta,color,fig)
 
-    fig.update_layout(
-        mapbox=dict(
-            style='satellite', # Estilo de mapa satelital
-            accesstoken=mapbox_access_token,
-            zoom=14, # Nivel de zoom inicial del mapa
-            center=dict(lat=lat_orig,lon=lng_orig),
-        ),
-        showlegend=False
-    )
+    # fig.update_layout(
+    #     mapbox=dict(
+    #         style='satellite', # Estilo de mapa satelital
+    #         accesstoken=mapbox_access_token,
+    #         zoom=14, # Nivel de zoom inicial del mapa
+    #         center=dict(lat=lat_orig,lon=lng_orig),
+    #     ),
+    #     showlegend=False
+    # )
     return fig
 
 

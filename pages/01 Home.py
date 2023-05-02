@@ -16,28 +16,6 @@ st.image('imagenes/Header_bastó.jpeg')
 setle= setle_list()# arroja dataframe arreglado de setle---
 
 
-# st.title('Información de Potrero de interés')
-
-
-# select_sl= st.selectbox('Seleccione un asentamiento a evaluar:',setle.name.unique())
-# nombre= setle[setle.name==select_sl]._id.values[0]
-# print(nombre)
-# elec_setle= selec_setle(setle,nombre) # arroja dataframe pequeño de un solo dato del asentamiento---
-
-# on_perimetro=filter_area_perimetro(df_gps,elec_setle.latitud_c, elec_setle.longitud_c, elec_setle.hectares)# arroja dataframe---
-# uuid_devis = on_perimetro.UUID.unique()
-
-# clicked_3 = st.button("Conteo dispositivo")
-# if clicked_3:
-#     st.write(
-#         f"En esta área hay: {len(uuid_devis)} collares que proveen datos de GPS de un total de 518 vacas en total"
-#     )
-
-# st.write('A continuación se pueden observar los diferentes perímetros a consultar a partir de los datos proveídos:')
-
-
-
-
 
 st.dataframe(setle[['name','hectares','latitud_c','longitud_c']],use_container_width=True)
 
@@ -56,7 +34,7 @@ if on_perimetro.shape[0]!=0:
     dt_vaca=  data_devices(on_perimetro,select)
     dt_vaca.createdAt= pd.to_datetime(dt_vaca.createdAt)
 
-    data_week= dt_vaca.groupby(dt_vaca[['createdAt']].isocalendar().week).agg({'UUID':'count'}).rename(columns={'UUID':'count_register'})
+    data_week= dt_vaca.groupby(dt_vaca[['createdAt']].isocalendar()[1]).agg({'UUID':'count'}).rename(columns={'UUID':'count_register'})
     data_week=data_week.reset_index()
 
 
@@ -86,15 +64,6 @@ st.plotly_chart(fig,use_container_width=True)
 
 
 
-# fi_time= filter_time_day(time_week,time_day)
-
-# if int(data_week['createdAt'].min())!= int(data_week['createdAt'].max()):
-#         fig= px.bar( week,x='createdAt',y='count_register')
-#         st.markdown('## Cantidad de registro por día')
-#         st.plotly_chart(fig,use_container_width=True)
-#         dia= st.slider('Selecione dia',int(week['createdAt'].min()) ,int(week['createdAt'].max()) )
-
-
 st.markdown('***')
 st.markdown('## Cantidad de registro por dia')
 
@@ -105,8 +74,7 @@ sep_time=time_week[time_week['createdAt'].dt.date ==day_select].groupby(time_wee
 sep_time.day= pd.to_datetime(sep_time.day)
 day=sep_time.day.dt.date.values
 
-# fig=px.bar(sep_time,x=sep_time.day.dt.day_name(), y=sep_time.count_register)
-# st.plotly_chart(fig,use_container_width=True) 
+
 
 try:
     date_week= obtener_fecha_inicio_fin(time_week.iloc[-1][['createdAt']].values[0])
@@ -116,14 +84,7 @@ except IndexError:
     st.warning('No hay datos para estos momento del dia')
 
 
-# dia = range(week)
-# time_day=st.select_slider('Selecione el dia',options=dia)
-
-
 fi_time= time_week[time_week['createdAt'].dt.date ==day_select]
-
-# st.subheader(day.upper())
-
 
 
 val_vaca= dataframe_interview_vaca(fi_time)
@@ -134,12 +95,13 @@ st.dataframe(val_vaca,use_container_width=True)
 if st.button('Recorrido en Mapa') or fi_time.shape[0]==1:
         fig = go.Figure()
         grafic_map(fi_time,[select], fi_time.iloc[0]['dataRowData_lat'], fi_time.iloc[0]['dataRowData_lng'], fig)
+        
         fig.update_layout(
             mapbox=dict(
                 style='satellite', # Estilo de mapa satelital
                 accesstoken=mapbox_access_token,
                 zoom=12, # Nivel de zoom inicial del mapa
-                center=dict(lat=elec_setle.latitud_c.values[0] , lon=elec_setle.longitud_c.values[0]),
+                center=dict(lat=fi_time.iloc[-1]['dataRowData_lat'] , lon= fi_time.iloc[-1]['dataRowData_lng']),
             ),
             showlegend=False
         )
@@ -174,24 +136,16 @@ if fi_time.shape[0]!=0:
     except AttributeError:
         st.table(fi_time[['dataRowData_lng','dataRowData_lat' ]])
         
-        
-        
-    
-        
+
     tabla_datos,tabla_resumen,tabla_diag= conducta_vaca_periodo(time_week, on_perimetro,select, select_sl ,date_week[0],date_week[1])# ACAAA ESTA CREADO EL DATAFRAME CON LOS VALORES
     
-    
-    
-    
-    
-    
+
 
     st.markdown('***')
 
     st.write('Teniendo en cuenta la distancia, la aceleración y el tiempo que varía de un punto a otro, se creo un modelo de K-means el que nos arroja un agrupamiento de las actividades de la vaca que se pueden visualizar así:')    
 
-    #st.dataframe(tabla_datos,use_container_width=True)
-    
+
     st.dataframe(tabla_resumen,use_container_width=True)
 
     st.write('Dados los parámetros óptimos, en la siguiente tabla se puede concluir que el la calidad de la distribución del tiempo que dedicó a cada actividad')

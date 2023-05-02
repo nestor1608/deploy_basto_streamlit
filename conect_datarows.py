@@ -2,9 +2,12 @@ import datetime
 import pandas as pd
 import pymongo
 
-data_mongo = pymongo.MongoClient('mongodb+srv://brandon:brandon1@cluster0.tfvievv.mongodb.net/?retryWrites=true&w=majority')
-
+async def connection (url):
+    data_mongo = pymongo.MongoClient(url)#'mongodb+srv://brandon:brandon1@cluster0.tfvievv.mongodb.net/?retryWrites=true&w=majority')
+    return data_mongo
 # Seleccionar una base de datos existente o crear una nueva llamada 'test'.
+
+data_mongo = connection('mongodb+srv://brandon:brandon1@cluster0.tfvievv.mongodb.net/?retryWrites=true&w=majority')
 db = data_mongo['test']
 
 # Seleccionar una colección de la base de datos llamada 'datarows'.
@@ -16,7 +19,7 @@ df_row._id = df_row._id.astype(str)
 df_gps=df_row[['UUID','dataRowType','createdAt','updatedAt','dataRowData_lat','dataRowData_lng','dataRowData_gpsAlt','dataRowData_gpsVel','dataRowData_gpsFixed']]
 
 
-def mongo_data(collection):
+async def mongo_data(collection):
     mongoColle= db[collection]
     data= list(mongoColle.find())
     df= pd.json_normalize(data,sep='_')
@@ -24,7 +27,7 @@ def mongo_data(collection):
     return df
 
 
-def setle_list():
+async def setle_list():
     setle_n= mongo_data('settlements')
     setle_n['latitud_c'] = setle_n.centralPoint.apply(lambda x: x[0]['lat'] if 'lat' in x[0] else None)
     setle_n['longitud_c'] = setle_n.centralPoint.apply(lambda x: x[0]['lng'] if 'lng' in x[0] else None)
@@ -34,7 +37,7 @@ def setle_list():
     setle_n.drop(setle_n[mascara].index,inplace=True)
     return setle_n
 
-def setle_clean(select):
+async def setle_clean(select):
     de= db['settlements']
     obj= de.find_one({'name':select})
     df_setle= pd.json_normalize(obj,sep='')
@@ -47,7 +50,7 @@ def selec_setle(data,select):
     df_setle = data[data._id== select]
     return df_setle
 
-def conect_animal():
+async def conect_animal():
         df_animal=mongo_data('animals')
         df_animal['animalSettlement']=df_animal['animalSettlement'].apply(lambda x:x[0])
         df_animal.animalSettlement=df_animal.animalSettlement.astype(str)
