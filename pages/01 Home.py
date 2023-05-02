@@ -43,8 +43,8 @@ st.write('Visualización de los registros obtenidos a lo largo del tiempo de ese
 
 
 st.write('Ahora puede observar una semana en específica con el menú siguiente:')
-
-if int(data_week['createdAt'].min())!= int(data_week['createdAt'].max()):
+print(data_week)
+if int(data_week['count_register'].min())!= int(data_week['count_register'].max()):
         fig= px.bar( data_week,x='createdAt',y='count_register')
         st.markdown('## Cantidad de registro por Semana')
         st.plotly_chart(fig,use_container_width=True)
