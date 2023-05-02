@@ -8,7 +8,7 @@ from conect_datarows import obtener_fecha_inicio_fin, df_gps,setle_list
 from prueba import conducta_vaca_periodo
 from suport_st import grafic_map,mapbox_access_token
 import plotly.express as px
-
+import datetime
 st.image('imagenes/Header_bastó.jpeg')
 
 # st.title('Información general')
