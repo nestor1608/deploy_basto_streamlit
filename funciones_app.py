@@ -79,12 +79,12 @@ def filter_time_day(data,momento):
 def week_data_filter(data,fecha):
     print(fecha)
     if isinstance(fecha,int):
-        data = data[data.createdAt.dt.strftime('%U') == fecha]
+        data = data[data.createdAt.dt.strftime('%U') == str(fecha)]
     else:
         week = obtener_fecha_inicio_fin(fecha)
         print(week,'week')
         data = data[(data.createdAt >= week[0]) & (data.createdAt <= week[1])]
-        print(data)
+    print(data)
     return data
 
 def count_day_hour(data):
