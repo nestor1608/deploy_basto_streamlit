@@ -43,7 +43,7 @@ st.write('Visualización de los registros obtenidos a lo largo del tiempo de ese
 
 
 st.write('Ahora puede observar una semana en específica con el menú siguiente:')
-print(data_week.columns)
+
 if int(data_week['createdAt'].min())!= int(data_week['createdAt'].max()):
         fig= px.bar( data_week,x=data_week['createdAt'],y=data_week['count_register'])
         st.markdown('## Cantidad de registro por Semana')
@@ -59,8 +59,8 @@ time_week= week_data_filter(dt_vaca,week)
 sep_time=time_week['createdAt'].groupby(dt_vaca.createdAt.dt.date).aggregate(['count']).rename(columns={'count':'count_register'}).reset_index()
 #sep_time=time_week.groupby(time_week.createdAt.dt.date).agg({'UUID':'count'}).rename(columns={'UUID':'count_register'}).reset_index().rename(columns={'createdAt':'day'})
 sep_time.createdAt= pd.to_datetime(sep_time.createdAt)
-print(sep_time.columns)
-day=sep_time.createdAt.dt.date.unique()
+print(sep_time.columns,'-',sep_time.shape )
+day=sep_time.createdAt.dt.date
 print(day)
 
 fig=px.bar(sep_time,x=sep_time.createdAt.dt.day, y=sep_time.count_register)
