@@ -53,14 +53,17 @@ if int(data_week['createdAt'].min())!= int(data_week['createdAt'].max()):
 st.write('En esa semana específica, puede visualizar los datos de un momento específico del día y sus datos de ese collar en específico:')
 #dt_vaca.createdAt = pd.to_datetime(dt_vaca.createdAt).strftime('%Y-%m-%d')
 
-dt_vaca.createdAt = pd.to_datetime(dt_vaca.createdAt)
+
 time_week= week_data_filter(dt_vaca,week)
 
-sep_time=time_week.groupby(time_week.createdAt.dt.date).agg({'UUID':'count'}).rename(columns={'UUID':'count_register'}).reset_index().rename(columns={'createdAt':'day'})
-sep_time.day= pd.to_datetime(sep_time.day)
-day=sep_time.day.dt.date.values
+sep_time=time_week['createdAt'].groupby(dt_vaca.createdAt.dt.date).aggregate(['count']).rename(columns={'count':'count_register'}).reset_index()
+#sep_time=time_week.groupby(time_week.createdAt.dt.date).agg({'UUID':'count'}).rename(columns={'UUID':'count_register'}).reset_index().rename(columns={'createdAt':'day'})
+sep_time.createdAt= pd.to_datetime(sep_time.createdAt)
+print(sep_time.columns)
+day=sep_time.createdAt.dt.date.unique()
+print(day)
 
-fig=px.bar(sep_time,x=sep_time.day.dt.day_name(), y=sep_time.count_register)
+fig=px.bar(sep_time,x=sep_time.createdAt.dt.day, y=sep_time.count_register)
 st.plotly_chart(fig,use_container_width=True) 
 
 
