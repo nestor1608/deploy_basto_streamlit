@@ -48,7 +48,7 @@ if int(data_week['createdAt'].min())!= int(data_week['createdAt'].max()):
         fig= px.bar( data_week,x=data_week['createdAt'],y=data_week['count_register'])
         st.markdown('## Cantidad de registro por Semana')
         st.plotly_chart(fig,use_container_width=True)
-        week= st.slider('Selecione semana',int(data_week['day'].min()) ,int(data_week['day'].max()) )
+        week= st.slider('Selecione semana',int(data_week['createdAt'].min()) ,int(data_week['createdAt'].max()) )
 
 st.write('En esa semana específica, puede visualizar los datos de un momento específico del día y sus datos de ese collar en específico:')
 #dt_vaca.createdAt = pd.to_datetime(dt_vaca.createdAt).strftime('%Y-%m-%d')
