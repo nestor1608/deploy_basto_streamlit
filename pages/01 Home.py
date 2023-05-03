@@ -51,7 +51,8 @@ if int(data_week['count_register'].min())!= int(data_week['count_register'].max(
         week= st.slider('Selecione semana',int(data_week['day'].min()) ,int(data_week['day'].max()) )
 
 st.write('En esa semana específica, puede visualizar los datos de un momento específico del día y sus datos de ese collar en específico:')
-
+dt_vaca.createdAt = pd.to_datetime(dt_vaca.createdAt).strftime('%Y-%m-%d')
+dt_vaca.createdAt = pd.to_datetime(dt_vaca.createdAt)
 time_week= week_data_filter(dt_vaca,week)
 
 sep_time=time_week.groupby(time_week.createdAt.dt.date).agg({'UUID':'count'}).rename(columns={'UUID':'count_register'}).reset_index().rename(columns={'createdAt':'day'})
