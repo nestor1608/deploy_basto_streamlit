@@ -78,7 +78,7 @@ def filter_time_day(data,momento):
 
 def week_data_filter(data,fecha):
     if isinstance(fecha,int):
-        data = data[data.createdAt.dt.week == fecha]
+        data = data[data.createdAt.dt.week == pd.to_datetime(fecha)]
     else:
         week = obtener_fecha_inicio_fin(fecha)
         data = data[(data.createdAt >= week[0]) & (data.createdAt <= week[1])]
