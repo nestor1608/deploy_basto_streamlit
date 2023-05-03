@@ -15,8 +15,6 @@ def filter_area_peri(data,latitud,longitud,metro):
     per_kilo= math.sqrt(metro)*0.01
     circulo= punto_referencia.buffer(per_kilo/111.32) # valor 1 grado aprox en kilometro en el ecuador 
     on_perimetro= gdf[gdf.geometry.within(circulo)]
-    agua = update_aguada(on_perimetro)
-    on_perimetro = on_perimetro.drop(on_perimetro[on_perimetro['UUID'].isin(agua.deviceMACAddress.unique())].index)
     return on_perimetro
 
 def gps_aguada(aguadas,df):

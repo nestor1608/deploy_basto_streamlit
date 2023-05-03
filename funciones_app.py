@@ -66,16 +66,6 @@ def obtener_fecha_inicio_fin(semana):
     return fecha_inicio, fecha_fin
 
 
-def filter_time_day(data,momento):
-    switch_dict={
-        'noche': data[((data.updatedAt.dt.hour > 20) & (data.updatedAt.dt.hour < 24))| ((data.updatedAt.dt.hour > 0) & (data.updatedAt.dt.hour < 7))],
-        'madrugada':  data[(data.updatedAt.dt.hour > 0) & (data.updatedAt.dt.hour < 7)],
-        'tarde':data[(data.updatedAt.dt.hour > 13) & (data.updatedAt.dt.hour < 20)],
-        'mañana':data[(data.updatedAt.dt.hour > 7) & (data.updatedAt.dt.hour < 13)]
-    }
-    return switch_dict.get(momento,'valor')
-
-
 def week_data_filter(data,fecha):
     print(fecha)
     if isinstance(fecha,int):
