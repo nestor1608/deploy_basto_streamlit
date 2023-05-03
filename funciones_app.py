@@ -69,13 +69,13 @@ def obtener_fecha_inicio_fin(semana):
 def week_data_filter(data,fecha):
     print(fecha)
     if isinstance(fecha,int):
-        data = data[data.createdAt.dt.strftime('%U') == str(fecha)]
+        dat= data[data.createdAt.dt.strftime('%U') == str(fecha)]
     else:
         week = obtener_fecha_inicio_fin(fecha)
         print(week,'week')
-        data = data[(data.createdAt >= week[0]) & (data.createdAt <= week[1])]
+        dat = data[(data.createdAt >= week[0]) & (data.createdAt <= week[1])]
     print(data)
-    return data
+    return dat
 
 def count_day_hour(data):
     sep_time=data.groupby([data.createdAt.dt.day_name(),data.createdAt.dt.hour]).agg({'UUID':'count'}).rename(columns={'UUID':'count_register'}).reset_index(level=[1]).rename(columns={'createdAt':'hours'}).reset_index().rename(columns={'createdAt':'day'})

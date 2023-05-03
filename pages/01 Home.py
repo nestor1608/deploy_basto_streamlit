@@ -59,11 +59,11 @@ print(time_week.shape,'shape wwekk')
 sep_time=time_week['createdAt'].groupby(dt_vaca.createdAt.dt.date).aggregate(['count']).rename(columns={'count':'count_register'}).reset_index()
 #sep_time=time_week.groupby(time_week.createdAt.dt.date).agg({'UUID':'count'}).rename(columns={'UUID':'count_register'}).reset_index().rename(columns={'createdAt':'day'})
 sep_time.createdAt= pd.to_datetime(sep_time.createdAt)
-print(sep_time.columns,'-',sep_time.shape )
+
 day=sep_time.createdAt.dt.date
 print(day)
 
-fig=px.bar(sep_time,x=sep_time.createdAt.dt.day, y=sep_time.count_register)
+fig=px.bar(sep_time,x=sep_time.createdAt.dt.day_name(), y=sep_time.count_register)
 st.plotly_chart(fig,use_container_width=True) 
 
 
