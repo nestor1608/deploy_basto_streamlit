@@ -2,10 +2,10 @@ from geopy.distance import great_circle
 from geopy import Point
 import geopandas as gpd
 from shapely.geometry import Point
-from conect_datarows import df_gps
 import math
 import pandas as pd
 import datetime
+from conect_datarows import mongo_data
 
 
 def distancia_recorrida(data):
@@ -21,31 +21,6 @@ def distancia_recorrida(data):
     return dista_km
 
 
-def interview_vaca(data): # tratar de filtrar por perimetro porque si hay valores (que los hay)fuera de rango de los -90 90 da error
-    data_dis=[]
-    data_vel=[]
-    data_time=[]
-    for i in range(0,data.shape[0]+1):
-        try:
-            dista_km= great_circle(tuple(data.iloc[i][['dataRowData_lat','dataRowData_lng']].values),tuple(data.iloc[i+1][['dataRowData_lat','dataRowData_lng']].values)).kilometers
-            if dista_km <= 8.:
-                data_dis.append(round(dista_km,3))
-            if data.iloc[i].dataRowData_gpsVel:
-                data_vel.append(round(data.iloc[i].dataRowData_gpsVel,3))
-                data_time.append(round(dista_km/data.iloc[i].dataRowData_gpsVel,3))
-            else:
-                data_time.append(round(dista_km/pd.Series(data_vel).mean(),3))# les puede dar error si el array de velocidad esta vacio... toma el valor promedio de las velocidades que hay hasta el momento
-        except IndexError:
-            pass
-    return data_dis,data_vel,data_time
-
-
-
-
-gdf= gpd.GeoDataFrame(df_gps,crs='EPSG:4326',geometry=gpd.points_from_xy(df_gps.dataRowData_lng,df_gps.dataRowData_lat))
-
-
-
 def perimetro_aprox(hectarea):
     """Funcion: funcion que saca el numero(float) del radio de un perimetra en kilometros
     Returns:
@@ -55,31 +30,6 @@ def perimetro_aprox(hectarea):
     lado = math.sqrt(hect)*10
     perim = lado*4
     return perim
-
-def filter_area_perimetro(data,latitud,longitud,hectareas):
-    """Funcion que genera a partir de otro dataframe, un dataframe nuevo a partir de un un punto latitud longitud y la cantidad de hectareas fitra ese perimetro
-<<<<<<< HEAD
-=======
-
->>>>>>> main
-    Args:
-        data(dataframe): dataframe a filtrar
-        latitud (gps): latitud de punto central
-        longitud (gps): longitud de punto central
-        hectareas (float): numero de hectareas que posee el terreno
-    Returns:
-        _type_: dataframe filtrado dentro de un perimetro generado
-    """
-    gdf= gpd.GeoDataFrame(data,crs='EPSG:4326',geometry=gpd.points_from_xy(data.dataRowData_lng,data.dataRowData_lat))
-    setle_lat=latitud
-    setle_lng=longitud
-    punto_referencia= Point(setle_lng,setle_lat)	
-    per_kilo= perimetro_aprox(hectareas)
-    circulo= punto_referencia.buffer(per_kilo/111.32) # valor 1 grado aprox en kilometro en el ecuador 
-    on_perimetro= gdf[gdf.geometry.within(circulo)]
-    agua = aguada(on_perimetro)
-    on_perimetro = on_perimetro.drop(on_perimetro[on_perimetro['UUID'] == agua.loc[0,'UUID']].index)
-    return on_perimetro
 
 
 def data_devices(data,uuid):
@@ -147,36 +97,88 @@ def count_day_hour(data):
     sep_time.day= sep_time.day.map(daytime)
     return sep_time
 
-def aguada(data: pd.DataFrame)->pd.DataFrame:
-    """"
-        Esta función retorna las coordenadas geográficas de la aguada en el lote dado.
-        :param gps: Dataframe de gps para obtener la ubicación del potrero.
-        :param device: Dataframe de gps para obtener los puntos fijos.
-        :param latitude: Coordenada, latitud del potrero.
-        :param longitude: Coordenada, longitud del potrero.
-        :param area: Tamaño del potrero en hectareas.
-        :return: Coordenadas (latitud y longitud) de la aguada.
+def conect_animal():
+        df_animal=mongo_data('animals')
+        df_animal['animalSettlement']=df_animal['animalSettlement'].apply(lambda x:x[0])
+        df_animal.animalSettlement=df_animal.animalSettlement.astype(str)
+        result= df_animal[(df_animal.caravanaNumber.str.contains('AGUADA'))|(df_animal.caravanaNumber.str.contains('PUNTO_FIJO'))]#lo use para extraer un csv con aguadas y puntos fijos
+        return result
+
+def update_aguada(setle):
+        df_devis= mongo_data('devices')
+        df_devis.deviceAnimalID=df_devis.deviceAnimalID.astype(str)
+        data_devise = df_devis[df_devis.deviceType=='PUNTO FIJO'] 
+        aguadas= conect_animal()
+        x= aguadas[aguadas['animalSettlement']==setle]
+        agua =data_devise[data_devise.deviceAnimalID.isin(x._id)]
+        return agua
+
+
+def select_data_by_date(df: pd.DataFrame, fecha: str) -> pd.DataFrame:
     """
-<<<<<<< HEAD
-    puntos_fijos = pd.read_csv('csv/devices_punto_fijo.csv')
-=======
-    puntos_fijos = pd.read_csv('devices_punto_fijo.csv')
->>>>>>> main
-    df_pf = puntos_fijos.drop(puntos_fijos[puntos_fijos['deviceMACAddress'].isin(['PRUEBA', 'MEVBE4FED3B7594'])].index)
-    df_merged = pd.merge(df_pf, data, left_on='deviceMACAddress', right_on='UUID')
-    df_merged['coordenadas'] = df_merged[['dataRowData_lat', 'dataRowData_lng']].apply(lambda x: ','.join(x.astype(str)), axis=1)
-    df_agrupado = df_merged.groupby('coordenadas').agg({'UUID': 'count'}).reset_index()
-    mask = df_agrupado['UUID'] == df_agrupado.UUID.unique().max()
-    punto_fijo = df_agrupado.loc[mask, 'coordenadas'].tolist()
-    uuid = df_merged.groupby('coordenadas')['UUID'].count()
-    max_uuid = uuid.max()
-    most_common_uuid = df_merged[df_merged.groupby('coordenadas')['UUID'].transform('count') == max_uuid]['UUID'].iloc[0]
-    lat, lng = punto_fijo[0].split(',')
-    lat = float(lat)
-    lng = float(lng)
-    punto_fijo = {'UUID': [most_common_uuid],'dataRowData_lat': [lat],'dataRowData_lng': [lng]}
-    df_punto_fijo = pd.DataFrame(punto_fijo)
-    return df_punto_fijo
+    Selecciona las filas de un DataFrame correspondientes a una fecha específica.
+    
+    Parametros:
+    - df: DataFrame de pandas que contiene la columna "createdAt".
+    - fecha: Fecha en formato de cadena, en el formato 'YYYY-MM-DD'.
+    
+    Returno:
+    - DataFrame de pandas que contiene solo las filas correspondientes a la fecha especificada.
+    """
+    
+    # Convertir la columna "createdAt" en un objeto datetime
+    df['createdAt'] = pd.to_datetime(df['createdAt'])
+
+    # Seleccionar solo las filas correspondientes a la fecha especificada
+    fecha_deseada = pd.to_datetime(fecha)
+    nuevo_df = df.loc[df['createdAt'].dt.date == fecha_deseada]
+
+    return nuevo_df
+
+def select_data_by_dates(df: pd.DataFrame, fecha_init: str, fecha_fin : str) -> pd.DataFrame:
+    """
+    Selecciona las filas de un DataFrame correspondientes a una fecha específica.
+    
+    Parametros:
+    - df: DataFrame de pandas que contiene la columna "createdAt".
+    - fecha: Fecha en formato de cadena, en el formato 'YYYY-MM-DD'.
+    
+    Returno:
+    - DataFrame de pandas que contiene solo las filas correspondientes a la fecha especificada.
+    """
+    
+    # Convertir la columna "createdAt" en un objeto datetime
+    df['createdAt'] = pd.to_datetime(df['createdAt'])
+
+    # Seleccionar solo las filas correspondientes a la fecha especificada
+    fecha_deseada1 = pd.to_datetime(fecha_init).date()
+    fecha_deseada2 = pd.to_datetime(fecha_fin).date()
+
+    nuevo_df = df[(df['createdAt'].dt.date >= fecha_deseada1) & (df['createdAt'].dt.date <= fecha_deseada2)]
+
+    return nuevo_df
+
+def filter_area_perimetro(data,latitud,longitud,hectareas):
+    """Funcion que genera a partir de otro dataframe, un dataframe nuevo a partir de un un punto latitud longitud y la cantidad de hectareas fitra ese perimetro
+
+    Args:
+        data(dataframe): dataframe a filtrar
+        latitud (gps): latitud de punto central
+        longitud (gps): longitud de punto central
+        hectareas (float): numero de hectareas que posee el terreno
+    Returns:
+        _type_: dataframe filtrado dentro de un perimetro generado
+    """
+    gdf= gpd.GeoDataFrame(data,crs='EPSG:4326',geometry=gpd.points_from_xy(data.dataRowData_lng,data.dataRowData_lat))
+    setle_lat=latitud
+    setle_lng=longitud
+    punto_referencia= Point(setle_lng,setle_lat)	
+    per_kilo= perimetro_aprox(hectareas)
+    circulo= punto_referencia.buffer(per_kilo/111.32) # valor 1 grado aprox en kilometro en el ecuador 
+    on_perimetro= gdf[gdf.geometry.within(circulo)]
+    agua = update_aguada(on_perimetro)
+    on_perimetro = on_perimetro.drop(on_perimetro[on_perimetro['UUID'].isin(agua.deviceMACAddress.unique())].index)
+    return on_perimetro
 
 def dataframe_interview_vaca(data): # tratar de filtrar por perimetro porque si hay valores (que los hay)fuera de rango de los -90 90 da error
     data_dis=[]
@@ -185,7 +187,7 @@ def dataframe_interview_vaca(data): # tratar de filtrar por perimetro porque si 
     data_inter= []
     data_in=[]
     data_fin=[]
-    data_alg=[]
+
     for i in range(0,data.shape[0]+1):
         try:
             dista_km= great_circle(tuple(data.iloc[i][['dataRowData_lat','dataRowData_lng']].values),tuple(data.iloc[i+1][['dataRowData_lat','dataRowData_lng']].values)).kilometers
@@ -193,12 +195,6 @@ def dataframe_interview_vaca(data): # tratar de filtrar por perimetro porque si 
             data_fin.append(data.iloc[i+1][['createdAt']].values[0])
             interval= int(data.iloc[i+1][['createdAt']].values[0].strftime('%H')) - int(data.iloc[i][['createdAt']].values[0].strftime('%H'))
             data_inter.append(interval)
-            if i == 0 : 
-                data_var = data.iloc[i]['dataRowData_gpsVel']
-                data_alg.append(data_var)
-            else:
-                data_var = data.iloc[i+1]['dataRowData_gpsVel']/data.iloc[i-1]['dataRowData_gpsVel']
-                data_alg.append(data_var)
             if dista_km <= 8.:
                 data_dis.append(round(dista_km,3))
             if data.iloc[i].dataRowData_gpsVel:
@@ -208,6 +204,16 @@ def dataframe_interview_vaca(data): # tratar de filtrar por perimetro porque si 
                 data_time.append(round(dista_km/pd.Series(data_vel).mean().round(3),3))# les puede dar error si el array de velocidad esta vacio... toma el valor promedio de las velocidades que hay hasta el momento
         except IndexError:
             pass
-    df = list(zip(data_in,data_fin,data_inter,data_dis,data_vel,data_time,data_alg))
-    df = pd.DataFrame(df,columns=['point_ini','point_next' ,'interval_time','distancia','velocidad','tiempo','charge_vel']) 
+    df = list(zip(data_in,data_fin,data_inter,data_dis,data_vel,data_time))
+    df = pd.DataFrame(df,columns=['point_ini','point_next','interval_time','distancia','velocidad','tiempo']) 
+    df['aceleracion']= df['velocidad'].diff()/df['tiempo'].diff()
+    df['p_distancia']= df['velocidad'] * df['tiempo'] 
     return df
+
+def transform(x):
+    horas =int(x.replace(',','').split('h')[0])
+    minutos=int(x.replace(',','').strip().split('h')[1].split('min')[0])
+    if minutos > 50:
+        horas +=1
+    return horas
+
